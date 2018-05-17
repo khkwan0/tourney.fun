@@ -1,0 +1,20 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cities.json": "^1.1.2",
+    "cors": "^2.8.4",
+    "countries-list": "^2.3.2",
+    "country-state-city": "0.0.5",
+    "countrycitystatejson": "^0.2.7",
+    "fastify": "^1.4.0",
+    "monk": "^6.0.6"
+  }
+}

@@ -1,0 +1,25 @@
+version: "2"
+services:
+  api:
+    build: ./api
+    volumes:
+      - /home/ken/tourney.fun/api:/usr/src/app
+  redis:
+    image: redis
+    ports:
+    - "8380:6379"
+    volumes:
+      - /home/ken/tourney.fun/redis:/data
+  mongo:
+    image: mongo
+    ports:
+      - "27047:27017"
+    volumes:
+      - /home/ken/tourney.fun/mongo:/data/db
+  app:
+    build: ./app/tourney.fun
+    volumes:
+      - /home/ken/tourney.fun/app/tourney.fun:/usr/src/app
+      - /home/ken/tourney.fun/app/tourney.fun/node_modules:/usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development

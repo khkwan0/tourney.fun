@@ -1,0 +1,20 @@
+{
+  "name": "tourney.fun",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "countries-list": "^2.3.2",
+    "react": "^16.3.2",
+    "react-bootstrap": "^0.32.1",
+    "react-calendar": "^2.14.0",
+    "react-dom": "^16.3.2",
+    "react-google-maps": "^9.4.5",
+    "react-scripts": "1.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
