@@ -8,31 +8,24 @@ import Map from './Map.js'
 class Submit extends Component {
 
   static Format = ['Single Elimination', 'Double Elimination', 'Round Robin', 'Killer', 'Other']
-  static Day = {
-    Sunday: 0,
-    Monday: 1,
-    Tuesday: 2,
-    Wednesday: 3,
-    Thursday: 4,
-    Friday: 5,
-    Saturday: 6,
-  }
+  static Day = ['Sunday', 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
   static Frequency = ['Weekly', 'Daily', 'Monthly', 'Once']
+  static GameType = ['Game Type','8 Ball', '9 Ball', '10 Ball', 'Snooker','Other']
 
   constructor(props) {
-    console.log(countries)
     super(props)
     this.state = {
       venue: '',
       country: null,
       state: null,
       city: null,
-      address: null,
+      address: '',
+      game: Submit.GameType[0],
       singles: true,
       format: Submit.Format[0],
       scotch: false,
       date: new Date(),
-      day: null,
+      day: Submit.Day[0],
       hour: 0,
       minute: 0,
       ampm: 1,
@@ -47,14 +40,17 @@ class Submit extends Component {
       currency: null,
       stateList: null,
       cityList: null,
+      countryList:countries.countries,
       phone: '',
       phonePrefix: null,
     }
+    this.clearState = this.state
     this.GetCities = this.GetCities.bind(this)
     this.HandleChangeVenue = this.HandleChangeVenue.bind(this)
     this.HandleChangeCountry = this.HandleChangeCountry.bind(this)
     this.HandleChangeState = this.HandleChangeState.bind(this)
     this.HandleChangeCity = this.HandleChangeCity.bind(this)
+    this.HandleChangeGameType = this.HandleChangeGameType.bind(this)
     this.HandleChangeFormat = this.HandleChangeFormat.bind(this)
     this.HandleChangeSingDoub = this.HandleChangeSingDoub.bind(this)
     this.HandleChangeScotch = this.HandleChangeScotch.bind(this)
@@ -73,6 +69,16 @@ class Submit extends Component {
     this.HandleRetrieveCoordinates = this.HandleRetrieveCoordinates.bind(this)
     this.HandleSubmit = this.HandleSubmit.bind(this)
 
+    this.countryList = []
+    this.countryList.push(<option key="select" value="select">Country</option>)
+    if (this.state.countryList) {
+      for (var country in this.state.countryList) {
+        this.countryList.push(<option key={country} value={country}>{this.state.countryList[country].name}</option>)
+      }
+    }
+
+    this.stateList = []
+    this.cityList = []
     this.hourList = []
     for (let i = 0; i < 12; i++) {
       let key = "hour"+i
@@ -102,9 +108,9 @@ class Submit extends Component {
     }
     
     this.dayList = []
-    for (var day in Submit.Day) {
+    Submit.Day.forEach((day) => {
       this.dayList.push(<option key={day} value={Submit.Day[day]}>{day.toUpperCase()}</option>)
-    }
+    })
 
     this.recurranceList = []
     for (var occurance in Submit.Frequency) {
@@ -115,14 +121,20 @@ class Submit extends Component {
     Submit.Format.forEach((format) => {
       this.formatList.push(<option key={format} value={format}>{format}</option>)
     })
+
+    this.gameTypeList = []
+    Submit.GameType.forEach((gameType) => {
+      this.gameTypeList.push(<option key={gameType} value={gameType}>{gameType}</option>)
+    })
   }
 
   HandleSubmit() {
     let toSubmit = this.state
     delete toSubmit.stateList
     delete toSubmit.cityList
+    delete toSubmit.countryList
     if (this.state.venue && this.state.email) {
-      fetch(Config.api.url+'/submit',
+      fetch(Config.api.url+'/submissions',
         {
           method: 'POST',
           credentials: 'include',
@@ -135,6 +147,11 @@ class Submit extends Component {
       )
       .then((result) => { return result.json() })
       .then((resultJson) => {
+        if (typeof resultJson._id !== 'undefined' && resultJson._id) {
+          let resetState = this.clearState
+          resetState.countryList = countries.countries
+          this.setState(resetState)
+        }
       })
       .catch((err) => {
         console.log(err)
@@ -172,7 +189,10 @@ class Submit extends Component {
     )
     .then((result) => { return result.json() })
     .then((resultJson) => {
-      console.log(resultJson.states)
+      this.stateList = []
+      resultJson.states.forEach((state) => {
+        this.stateList.push(<option key={state} value={state}>{state}</option>)
+      })
       this.setState({
         stateList: resultJson.states
       })
@@ -206,6 +226,11 @@ class Submit extends Component {
     .then((result) => { return result.json() })
     .then((resultJson) => {
       if (resultJson.cities && resultJson.cities.length) {
+        this.cityList = []
+        resultJson.cities.forEach((city) => {
+          let key = 'city'+city
+          this.cityList.push(<option key={key} value={city}>{city}</option>)
+        })
         this.setState({
           cityList: resultJson.cities
         })
@@ -216,6 +241,12 @@ class Submit extends Component {
     })
     }
 
+  }
+
+  HandleChangeGameType(event) {
+    this.setState({
+      gameType: event.target.value
+    })
   }
 
   HandleChangeSingDoub(event) {
@@ -317,7 +348,6 @@ class Submit extends Component {
     if (this.state.venue && this.state.address && this.state.country) {
       let searchTerm = this.state.venue + ','+this.state.address+','+this.state.country
       searchTerm = encodeURI(searchTerm)
-      console.log(searchTerm)
       fetch('https://maps.googleapis.com/maps/api/geocode/json?address='+searchTerm+'&key='+Config.Google.APIKEY,
         {
           method: 'GET'
@@ -337,26 +367,6 @@ class Submit extends Component {
   }
 
   render() {
-    let stateList = []
-    stateList.push(<option key="stateselect" value="select">State/Province</option>)
-    if (this.state.stateList) {
-      this.state.stateList.forEach((state) => {
-        stateList.push(<option key={state} value={state}>{state}</option>)
-      })
-    }
-    let cityList = []
-    cityList.push(<option key="cityselect" value="select">City</option>)
-    if (this.state.cityList) {
-      this.state.cityList.forEach((city) => {
-        let key = 'city'+{city}
-        cityList.push(<option key={key} value={city}>{city}</option>)
-      })
-    }
-    let countryList = []
-    countryList.push(<option key="select" value="select">Country</option>)
-    for (var country in countries.countries) {
-      countryList.push(<option key={country} value={country}>{countries.countries[country].name}</option>)
-    }
 
     return (
       <div>
@@ -375,7 +385,7 @@ class Submit extends Component {
             </Col>
             <Col sm={4}>
               <FormControl componentClass="select" placeholder="Country" onChange={this.HandleChangeCountry}>
-                {countryList}
+                {this.countryList}
               </FormControl>
             </Col>
           </FormGroup>
@@ -385,7 +395,7 @@ class Submit extends Component {
             </Col>
             <Col sm={4}>
               <FormControl componentClass="select" placeholder="State/Province" onChange={this.HandleChangeState}>
-                {stateList}
+                {this.stateList}
               </FormControl>
             </Col>
           </FormGroup>
@@ -395,7 +405,7 @@ class Submit extends Component {
             </Col>
             <Col sm={4}>
               <FormControl componentClass="select" placeholder="City" onChange={this.HandleChangeCity}>
-                {cityList}
+                {this.cityList}
               </FormControl>
             </Col>
           </FormGroup>
@@ -404,7 +414,7 @@ class Submit extends Component {
               Street Address
             </Col>
             <Col sm={4}>
-              <FormControl componentClass="textarea" placeholder="Address" onChange={this.HandleChangeAddress} />
+              <FormControl componentClass="textarea" placeholder="Address" value={this.state.address} onChange={this.HandleChangeAddress} />
             </Col>
           </FormGroup>
           <div>
@@ -420,6 +430,16 @@ class Submit extends Component {
               </div>
             </div>
           }
+          <FormGroup controlId="gameType">
+            <Col componentClass={ControlLabel} sm={2}>
+              Game Type
+            </Col>
+            <Col sm={4}>
+              <FormControl componentClass="select" onChange={this.HandleChangeGameType}>
+                {this.gameTypeList}
+              </FormControl>
+            </Col>
+          </FormGroup>
           <FormGroup controlId="format">
             <Col componentClass={ControlLabel} sm={2}>
               Format

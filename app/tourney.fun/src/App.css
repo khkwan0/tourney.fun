@@ -30,3 +30,21 @@
 .mainContainer {
   margin-top:88px;
 }
+
+.tourney_area {
+  display:flex;
+  flex-direction: row;
+  margin-top: 10px;
+}
+
+.tourney_info {
+  width: 30%;
+  background-color: green;
+  margin-left: 10px;
+  color: white;
+  border-radius: 10px;
+}
+
+.location_area {
+  font-size: 10px;
+}
