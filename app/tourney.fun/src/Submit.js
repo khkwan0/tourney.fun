@@ -4,6 +4,7 @@ import countries from 'countries-list'
 import Calendar from 'react-calendar'
 import Config from './config.js'
 import Map from './Map.js'
+import FileUpload from './FileUpload.js'
 
 class Submit extends Component {
 
@@ -43,6 +44,7 @@ class Submit extends Component {
       countryList:countries.countries,
       phone: '',
       phonePrefix: null,
+			websiteURL: ''
     }
     this.clearState = this.state
     this.GetCities = this.GetCities.bind(this)
@@ -67,6 +69,7 @@ class Submit extends Component {
     this.HandleChangePhone = this.HandleChangePhone.bind(this)
     this.HandleChangeDate = this.HandleChangeDate.bind(this)
     this.HandleRetrieveCoordinates = this.HandleRetrieveCoordinates.bind(this)
+    this.HandleChangeWebSite = this.HandleChangeWebSite.bind(this)
     this.HandleSubmit = this.HandleSubmit.bind(this)
 
     this.countryList = []
@@ -344,6 +347,12 @@ class Submit extends Component {
     })
   }
 
+	HandleChangeWebSite(event) {
+		this.setState({
+			websiteURL: event.target.value
+		})
+	}
+
   HandleRetrieveCoordinates() {
     if (this.state.venue && this.state.address && this.state.country) {
       let searchTerm = this.state.venue + ','+this.state.address+','+this.state.country
@@ -376,9 +385,17 @@ class Submit extends Component {
               Venue
             </Col>
             <Col sm={6}>
-              <FormControl type="text" placeholder="Venue" onChange={this.HandleChangeVenue} value={this.state.venue} />
+              <FormControl type="text" placeholder="Venue (Required)" onChange={this.HandleChangeVenue} value={this.state.venue} />
             </Col>
           </FormGroup>
+					<FormGroup controlId="formWebsite">
+						<Col componentClass={ControlLabel} sm={2}>
+							Website URL
+						</Col>
+						<Col sm={6}>
+							<FormControl type="text" placeholder="Website URL" onChange={this.HandleChangeWebSite} value={this.state.websiteURL} />
+						</Col>
+					</FormGroup>
           <FormGroup controlId="formCountry">
             <Col componentClass={ControlLabel} sm={2}>
               Country 
@@ -414,7 +431,7 @@ class Submit extends Component {
               Street Address
             </Col>
             <Col sm={4}>
-              <FormControl componentClass="textarea" placeholder="Address" value={this.state.address} onChange={this.HandleChangeAddress} />
+              <FormControl componentClass="textarea" placeholder="Address (Required)" value={this.state.address} onChange={this.HandleChangeAddress} />
             </Col>
           </FormGroup>
           <div>
@@ -515,6 +532,14 @@ class Submit extends Component {
             {typeof this.state.currency !== 'undefined' && this.state.currency && 
               <Col sm={1}>{this.state.currency}</Col>
             }
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={2}>
+              Add some photos:
+            </Col>
+            <Col sm={2}>
+              <FileUpload />
+            </Col>
           </FormGroup>
           <FormGroup>
             <Col componentClass={ControlLabel} sm={2}>

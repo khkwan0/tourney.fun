@@ -15,9 +15,11 @@
     "country-state-city": "0.0.5",
     "countrycitystatejson": "^0.2.7",
     "fastify": "^1.4.0",
+    "fastify-multipart": "^0.5.0",
     "geo-tz": "^4.0.1",
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.17",
-    "monk": "^6.0.6"
+    "monk": "^6.0.6",
+    "pump": "^3.0.0"
   }
 }

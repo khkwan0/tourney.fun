@@ -4,10 +4,18 @@ const config = require('./config.js')
 const monk = require('monk')
 const moment = require('moment-timezone')
 const geotz = require('geo-tz')
+const fs = require('fs')
+const pump = require('pump')
 
 const db = new monk(config.mongo.url+'/tourneyfun')
 
 fastify.use(require('cors')({origin: true, credentials: true}))
+fastify.register(require('fastify-multipart'), {
+  limits: {
+    fileSize: 1000000,
+    files: 20
+  }
+})
 
 fastify.get('/getstates/:country', (req, res) => {
   let states = csc.getStatesByShort(req.params.country)
@@ -121,6 +129,34 @@ fastify.get('/tournaments/:lat/:lng', (req, res) => {
     res.code(500).send(err)
   })
 })
+
+fastify.post('/images/venue/', (req, res) => {
+  console.log('images/venue')
+  const mp = req.multipart(uploadHandler, (err) => {
+    if (err) console.log(err)
+    res.code(200).send()
+  })
+
+  mp.on('field', (key, value) => {
+    console.log('form-data', key, value)
+  })
+
+})
+
+fastify.post('/images/logo', (req, res) => {
+  const mp = req.multipart(uploadHandler, (err) => {
+    if (err) console.log(err)
+    res.code(200).send()
+  })
+  mp.on('field', (key, value) => {
+    console.log('form-data', key, value)
+  })
+})
+
+uploadHandler = (field, file, filename, encoding, mimetype) => {
+  file.on('limit', () => console.log('file size limit reached'))
+  pump(file, fs.createWriteStream('./tmp/'+filename))
+}
 
 fastify.post('/submissions', (req, res) => {
   console.log('submit')

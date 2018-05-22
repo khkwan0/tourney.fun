@@ -28,6 +28,7 @@ class App extends Component {
     this.ToggleAdmin = this.ToggleAdmin.bind(this)
     this.ToggleAbout = this.ToggleAbout.bind(this)
     this.HandleSeeMore = this.HandleSeeMore.bind(this)
+    this.HandleGoHome = this.HandleGoHome.bind(this)
   }
 
   componentWillMount() {
@@ -98,6 +99,14 @@ class App extends Component {
     })
   }
 
+	HandleGoHome() {
+    this.setState({
+      doAdmin: false,
+      doSubmit: false,
+      doAbout: false,
+    })
+	}
+
   render() {
     console.log(this.state.tourneys)
     return (
@@ -105,7 +114,7 @@ class App extends Component {
         <Navbar inverse collapseOnSelect fixedTop>
           <Navbar.Header>
             <Navbar.Brand>
-              <img src={logo} className="App-logo" alt="logo" />
+              <img src={logo} className="App-logo" alt="logo" onClick={this.HandleGoHome} />
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>
@@ -145,9 +154,6 @@ class App extends Component {
                   <span sm={2}>
                     Your approximate location: {this.state.location}
                   </span>
-                  <span sm={2}>
-                    ({this.state.lat},{this.state.lng})
-                  </span>
                 </div>
                 <div>
                   <span>
@@ -169,6 +175,11 @@ class App extends Component {
                     )
                   })
                 }
+                {(!this.state.tourneys || this.state.tourneys.today.length === 0) &&
+                  <div>
+                    <span>No events found</span>
+                  </div>
+                }
               </div>
               <div className="todays_tourney_header">
                 <h4>Events <span style={{color: 'red', fontWeight: 'bold'}}>TOMORROW</span> within 10 Km of your location</h4>
@@ -180,6 +191,11 @@ class App extends Component {
                       <TourneyPanel tourney={tourney} />
                     )
                   })
+                }
+                {(!this.state.tourneys || this.state.tourneys.tomorrow.length === 0) &&
+                  <div>
+                    <span>No events found</span>
+                  </div>
                 }
               </div>
               <div>
