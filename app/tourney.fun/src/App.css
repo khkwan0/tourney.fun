@@ -27,8 +27,22 @@
   to { transform: rotate(360deg); }
 }
 
+html body {
+  height: 100%;
+}
+
 .mainContainer {
-  margin-top:88px;
+  padding-top:88px;
+  background: url('https://api.tourney.fun/images/table.jpg') no-repeat fixed center;
+  background-attachment: fixed;
+  color: #eee;
+  height: 100%;
+}
+
+
+.seemorebutton {
+  margin-top: 20px;
+  margin-bottom:20px;
 }
 
 .atourney {
@@ -59,4 +73,27 @@
 
 .location_area {
   font-size: 10px;
+}
+
+.officiallogin {
+  background-color: blue;
+  border-radius: 10px;
+}
+
+.contactarea {
+  padding: 5px;
+}
+
+.email {
+  font-weight: bold;
+}
+
+.emaillogin {
+  padding: 5px;
+  width: 75%
+}
+
+.pwdlogin {
+  padding: 5px;
+  width: 75%;
 }

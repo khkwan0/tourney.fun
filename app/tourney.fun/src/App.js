@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { Button, Nav, Navbar, NavItem } from 'react-bootstrap'
+import { Image, Button, Nav, Navbar, NavItem, NavDropdown } from 'react-bootstrap'
 import logo from './image820.png'
 import './App.css'
 import Config from './config.js'
 
 import Submit from './Submit.js'
 import Admin from './Admin.js'
-import TourneyPanel from './TourneyPanel.js'
-import TourneyDetails from './TourneyDetails.js'
+import TourneyPanel from './TourneyPanel'
+import TourneyDetails from './TourneyDetails'
+import LoginPanel from './LoginPanel'
 
 class App extends Component {
   constructor(props) {
@@ -24,7 +25,10 @@ class App extends Component {
       currentTime: '',
       currentDayOfWeek: 1,
       seeMore: false,
-      selectedId: null
+      selectedId: null,
+      showLogin: false,
+      isLoggedIn: false,
+      bkgdImg: null
     }
     this.ToggleSubmit = this.ToggleSubmit.bind(this)
     this.ToggleAdmin = this.ToggleAdmin.bind(this)
@@ -33,6 +37,21 @@ class App extends Component {
     this.HandleGoHome = this.HandleGoHome.bind(this)
     this.SelectEvent = this.SelectEvent.bind(this)
     this.CloseDetails = this.CloseDetails.bind(this)
+    this.ToggleLogin = this.ToggleLogin.bind(this)
+    this.HandleLogout = this.HandleLogout.bind(this)
+  }
+
+  ToggleLogin() {
+    console.log('toggle')
+    this.setState({
+      showLogin: !this.state.showLogin
+    })
+  }
+
+  HandleLogout() {
+    this.setState({
+      isLoggedIn: false
+    })
   }
 
   componentWillMount() {
@@ -99,7 +118,7 @@ class App extends Component {
 
   HandleSeeMore() {
     this.setState({
-      seeMore: true
+      seeMore: !this.state.seeMore
     })
   }
 
@@ -125,7 +144,6 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state.tourneys)
     return (
       <div className="App">
         <Navbar inverse collapseOnSelect fixedTop>
@@ -148,12 +166,41 @@ class App extends Component {
                   <NavItem onClick={this.ToggleSubmit} eventKey={1}>
                     Submit
                   </NavItem>
-                  <NavItem onClick={this.ToggleAdmin} eventKey={2}>
-                    Admin
+                  <NavItem className="officiallogin" onClick={this.ToggleLogin} eventKey={2}>
+                    Event Offical Login
                   </NavItem>
+                  {this.state.isLoggedin &&
+                    <NavItem onClick={this.HandleLogout}>
+                      Logout
+                    </NavItem>
+                  }
+                  {this.state.isLoggedIn &&
+                    <NavItem onClick={this.ToggleAdmin}>
+                      Admin
+                    </NavItem>
+                  }
+                  <NavDropdown title="Contact Us" id="contact">
+                    <div className="contactarea">
+                      For information, questions, or comments, please contact:
+                      <div>
+                        <span className="email">khkwan0@gmail.com</span>
+                      </div>
+                    </div>
+                  </NavDropdown>
+
                 </Nav>
           </Navbar.Collapse>
         </Navbar>
+        <Navbar fixedBottom>
+          <Navbar.Header>
+            <Navbar.Brand>
+              Copyright 2018
+            </Navbar.Brand>
+          </Navbar.Header>
+        </Navbar>
+        {this.state.showLogin &&
+          <LoginPanel closeLogin={this.ToggleLogin} />
+        }
         <div className="mainContainer">
           <div>
             <span>A crowd sourced international database of tournaments near you.</span>
@@ -227,7 +274,14 @@ class App extends Component {
               </div>
               <div>
                 {!this.state.seeMore &&
-                  <Button bsStyle="success" onClick={this.HandleSeeMore}>See more</Button>
+                  <div className="seemorebutton">
+                    <Button bsStyle="success" onClick={this.HandleSeeMore}>See more</Button>
+                  </div>
+                }
+                {this.state.seeMore && 
+                  <div className="seemorebutton">
+                    <Button bsStyle="success" onClick={this.HandleSeeMore}>See Less</Button>
+                  </div>
                 }
                 {this.state.seeMore &&
                   <div>
