@@ -28,9 +28,10 @@
 }
 
 body {
-  background: url('https://api.tourney.fun/images/table.jpg') no-repeat fixed center;
+  background: url('https://api.tourney.fun/images/table.jpg');
+  background-position: center center;
   background-attachment: fixed;
-  background-size: 100% auto;
+  background-size: auto auto;
 }
 
 .mainContainer {
