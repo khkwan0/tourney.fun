@@ -31,19 +31,30 @@
   margin-top:88px;
 }
 
+.atourney {
+  margin-left:10px;
+  margin-right: 10px;
+}
+
+.imageplaceholder {
+  width: 200px;
+  height: 200px;
+}
+
 .tourney_area {
   display:flex;
   flex-direction: row;
-  margin-top: 10px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  justify-content: center;
 }
 
 .tourney_info {
-  width: 30%;
+  width: 200px;
   background-color: green;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-top: 10px;
   color: white;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 
 .location_area {

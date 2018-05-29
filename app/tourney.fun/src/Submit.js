@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Form, Col, ControlLabel, Checkbox, Radio, FormGroup, FormControl } from 'react-bootstrap'
+import { Image, Glyphicon, Button, Form, Col, ControlLabel, Checkbox, Radio, FormGroup, FormControl } from 'react-bootstrap'
 import countries from 'countries-list'
 import Calendar from 'react-calendar'
 import Config from './config.js'
@@ -44,7 +44,8 @@ class Submit extends Component {
       countryList:countries.countries,
       phone: '',
       phonePrefix: null,
-			websiteURL: ''
+			websiteURL: '',
+      images: []
     }
     this.clearState = this.state
     this.GetCities = this.GetCities.bind(this)
@@ -70,6 +71,8 @@ class Submit extends Component {
     this.HandleChangeDate = this.HandleChangeDate.bind(this)
     this.HandleRetrieveCoordinates = this.HandleRetrieveCoordinates.bind(this)
     this.HandleChangeWebSite = this.HandleChangeWebSite.bind(this)
+    this.HandleAddImages = this.HandleAddImages.bind(this)
+    this.HandleRemoveImage = this.HandleRemoveImage.bind(this)
     this.HandleSubmit = this.HandleSubmit.bind(this)
 
     this.countryList = []
@@ -160,6 +163,20 @@ class Submit extends Component {
         console.log(err)
       })
     }
+  }
+
+  HandleRemoveImage(idx) {
+    let images = this.state.images
+    images.splice(idx, 1)
+    this.setState({
+      images: images
+    })
+  }
+
+  HandleAddImages(images) {
+    this.setState({
+      images:images
+    })
   }
 
   HandleChangeVenue(event) {
@@ -538,7 +555,19 @@ class Submit extends Component {
               Add some photos:
             </Col>
             <Col sm={2}>
-              <FileUpload />
+              <FileUpload handleAddImages={this.HandleAddImages} />
+            </Col>
+            <Col sm={2}>
+              {this.state.images.map((image, idx) => {
+                  let url = Config.cdn.url + '/images/tmp/' +image.th
+                  return(
+                    <div key={idx}>
+                      <Image src={url} thumbnail/>
+                      <Button onClick={()=>this.HandleRemoveImage(idx)}><Glyphicon glyph="remove" /></Button>
+                    </div>
+                  )
+                })
+              }
             </Col>
           </FormGroup>
           <FormGroup>

@@ -6,6 +6,9 @@ const moment = require('moment-timezone')
 const geotz = require('geo-tz')
 const fs = require('fs')
 const pump = require('pump')
+const crypto = require('crypto')
+const jimp = require('jimp')
+const path = require('path')
 
 const db = new monk(config.mongo.url+'/tourneyfun')
 
@@ -15,6 +18,11 @@ fastify.register(require('fastify-multipart'), {
     fileSize: 1000000,
     files: 20
   }
+})
+
+fastify.register(require('fastify-static'), {
+  root: path.join(__dirname, 'cdn'),
+  prefix: '/images/',
 })
 
 fastify.get('/getstates/:country', (req, res) => {
@@ -130,17 +138,59 @@ fastify.get('/tournaments/:lat/:lng', (req, res) => {
   })
 })
 
+const imgResize = (images) => {
+  return new Promise((resolve, reject) => {
+    let results = []
+    let resizes = images.map((image) => {
+      return new Promise((resolve, reject) => {
+        let thumbName = image.tmpName+'_th'+'.'+image.ext
+        jimp.read('./cdn/tmp/'+image.tmpName+'.'+image.ext)
+        .then((img) => {
+          return img.contain(config.thumbSize.w, config.thumbSize.h).write('./cdn/tmp/'+thumbName)
+        })
+        .then(() => {
+          image.th = thumbName
+          resolve(image)
+        })
+        .catch((err) => {
+          console.log(err)
+          reject(err)
+        })
+      })
+    })
+    Promise.all(resizes)
+    .then((output) => {
+      resolve(output)
+    })
+    .catch((err) => {
+      reject(err)
+    })
+  })
+}
+
 fastify.post('/images/venue/', (req, res) => {
   console.log('images/venue')
+  let images = []
   const mp = req.multipart(uploadHandler, (err) => {
     if (err) console.log(err)
-    res.code(200).send()
+    imgResize(images)
+    .then((results) => {
+      res.code(200).send(results)
+    })
   })
 
   mp.on('field', (key, value) => {
     console.log('form-data', key, value)
   })
 
+  function uploadHandler(field, file, filename, encoding, mimetype)  {
+    file.on('limit', () => console.log('file size limit reached'))
+    filename.replace('/\//g', '')
+    let ext = filename.split('.').pop()
+    let shasum = crypto.createHash('sha256').update(filename+new Date().getTime()).digest('hex')
+    pump(file, fs.createWriteStream('./cdn/tmp/'+shasum+'.'+ext))
+    images.push({tmpName: shasum, ext:ext, origName: filename})
+  }
 })
 
 fastify.post('/images/logo', (req, res) => {
@@ -153,10 +203,6 @@ fastify.post('/images/logo', (req, res) => {
   })
 })
 
-uploadHandler = (field, file, filename, encoding, mimetype) => {
-  file.on('limit', () => console.log('file size limit reached'))
-  pump(file, fs.createWriteStream('./tmp/'+filename))
-}
 
 fastify.post('/submissions', (req, res) => {
   console.log('submit')
@@ -169,6 +215,10 @@ fastify.post('/submissions', (req, res) => {
   }
   submissions.insert(req.body)
   .then((result) => {
+    req.body.images.forEach((image) => {
+      fs.rename('./cdn/tmp/'+image.tmpName+'.'+image.ext, './cdn/'+image.tmpName+'.'+image.ext, ()=>{})
+      fs.rename('./cdn/tmp/'+image.th, './cdn/'+image.th, () => {})
+    })
     res.code(200).send(result)
   })
   .catch((err) => {

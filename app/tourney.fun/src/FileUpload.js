@@ -5,6 +5,9 @@ import Dropzone from 'react-dropzone'
 class FileUpload extends Component {
   constructor(props) {
     super(props)
+    this.state = {
+      images: []
+    }
     this.onDrop = this.onDrop.bind(this)
   }
 
@@ -26,6 +29,8 @@ class FileUpload extends Component {
     )
     .then((result) => { return result.json() })
     .then((resultJson) => {
+      console.log(resultJson)
+      this.props.handleAddImages(resultJson)
     })
     .catch((err) => {
     })
@@ -33,9 +38,16 @@ class FileUpload extends Component {
 
   render() {
     return(
-      <Dropzone onDrop={this.onDrop}>
-        <div>Try dropping some files here, or click to select files to upload</div>
-      </Dropzone>
+      <div>
+        <Dropzone onDrop={this.onDrop}>
+          <div>Try dropping some files here, or click to select files to upload</div>
+        </Dropzone>
+        <div>
+          {this.state.images.length > 0 &&
+            <span>{this.state.images.length} saved</span>
+          }      
+        </div>
+      </div>
     )
   }
 }

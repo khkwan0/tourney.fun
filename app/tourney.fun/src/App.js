@@ -7,6 +7,7 @@ import Config from './config.js'
 import Submit from './Submit.js'
 import Admin from './Admin.js'
 import TourneyPanel from './TourneyPanel.js'
+import TourneyDetails from './TourneyDetails.js'
 
 class App extends Component {
   constructor(props) {
@@ -22,13 +23,16 @@ class App extends Component {
       tourneys: null,
       currentTime: '',
       currentDayOfWeek: 1,
-      seeMore: false
+      seeMore: false,
+      selectedId: null
     }
     this.ToggleSubmit = this.ToggleSubmit.bind(this)
     this.ToggleAdmin = this.ToggleAdmin.bind(this)
     this.ToggleAbout = this.ToggleAbout.bind(this)
     this.HandleSeeMore = this.HandleSeeMore.bind(this)
     this.HandleGoHome = this.HandleGoHome.bind(this)
+    this.SelectEvent = this.SelectEvent.bind(this)
+    this.CloseDetails = this.CloseDetails.bind(this)
   }
 
   componentWillMount() {
@@ -106,6 +110,19 @@ class App extends Component {
       doAbout: false,
     })
 	}
+  
+  SelectEvent(eventId) {
+    console.log(eventId)
+    this.setState({
+      selectedId: eventId
+    })
+  }
+
+  CloseDetails() {
+    this.setState({
+      selectedId: null
+    })
+  }
 
   render() {
     console.log(this.state.tourneys)
@@ -168,10 +185,15 @@ class App extends Component {
                 <h4>Events <span style={{color: 'red', fontWeight: 'bold'}}>TODAY</span> within 10 Km of your location</h4>
               </div>
               <div className="tourney_area">
-                {this.state.tourneys && this.state.tourneys.today.map((tourney) =>
+                {this.state.tourneys && this.state.tourneys.today.map((tourney, index) =>
                   {
                     return(
-                      <TourneyPanel tourney={tourney} />
+                      <div key={index}>
+                        <TourneyPanel tourney={tourney} showInfo={this.SelectEvent} />
+                        {(this.state.eventId === tourney._id) &&
+                          <TourneyDetails tourney={tourney} closeModal={this.CloseDetails} />
+                        }
+                      </div>
                     )
                   })
                 }
@@ -185,10 +207,15 @@ class App extends Component {
                 <h4>Events <span style={{color: 'red', fontWeight: 'bold'}}>TOMORROW</span> within 10 Km of your location</h4>
               </div>
               <div className="tourney_area">
-                {this.state.tourneys && this.state.tourneys.tomorrow.map((tourney) =>
+                {this.state.tourneys && this.state.tourneys.tomorrow.map((tourney, index) =>
                   {
                     return(
-                      <TourneyPanel tourney={tourney} />
+                      <div key={index}>
+                        <TourneyPanel key={index} tourney={tourney} showInfo={this.SelectEvent} />
+                        {(this.state.selectedId === tourney._id) &&
+                          <TourneyDetails tourney={tourney} closeModal={this.CloseDetails} />
+                        }
+                      </div>
                     )
                   })
                 }
@@ -208,9 +235,16 @@ class App extends Component {
                       <h4>Events <span style={{color: 'red', fontWeight: 'bold'}}>OTHER Days</span> within 10 Km of your location</h4>
                     </div>
                     <div className="tourney_area">
-                      {this.state.tourneys && this.state.tourneys.other.map((tourney) =>
+                      {this.state.tourneys && this.state.tourneys.other.map((tourney, index) =>
                         {
-                          return(<TourneyPanel tourney={tourney} />)
+                          return(
+                            <div key={index}>
+                              <TourneyPanel key={index} tourney={tourney} showInfo={this.SelectEvent} />
+                              {(this.state.selectedId === tourney._id) &&
+                                <TourneyDetails tourney={tourney} closeModal={this.CloseDetails} />
+                              }
+                            </div>
+                          )
                         })
                       }
                     </div>
