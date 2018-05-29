@@ -27,16 +27,16 @@
   to { transform: rotate(360deg); }
 }
 
-html body {
-  height: 100%;
+body {
+  background: url('https://api.tourney.fun/images/table.jpg') no-repeat fixed center;
+  background-attachment: fixed;
+  background-size: 100% auto;
 }
 
 .mainContainer {
   padding-top:88px;
-  background: url('https://api.tourney.fun/images/table.jpg') no-repeat fixed center;
-  background-attachment: fixed;
   color: #eee;
-  height: 100%;
+  padding-bottom: 100px;
 }
 
 
@@ -46,6 +46,7 @@ html body {
 }
 
 .atourney {
+  margin-top:40px;
   margin-left:10px;
   margin-right: 10px;
 }
