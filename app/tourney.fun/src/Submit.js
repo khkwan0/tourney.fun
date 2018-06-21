@@ -563,7 +563,7 @@ class Submit extends Component {
                   return(
                     <div key={idx}>
                       <Image src={url} thumbnail/>
-                      <Button onClick={()=>this.HandleRemoveImage(idx)}><Glyphicon glyph="remove" /></Button>
+                      <Button onClick={()=>this.HandleRemoveImage(idx)}><Glyphicon glyph="trash" /></Button>
                     </div>
                   )
                 })

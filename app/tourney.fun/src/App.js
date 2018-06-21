@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Button, Nav, Navbar, NavItem, NavDropdown } from 'react-bootstrap'
+import { Glyphicon, Button, Nav, Navbar, NavItem, NavDropdown } from 'react-bootstrap'
 import logo from './image820.png'
 import './App.css'
 import Config from './config.js'
@@ -39,6 +39,13 @@ class App extends Component {
     this.CloseDetails = this.CloseDetails.bind(this)
     this.ToggleLogin = this.ToggleLogin.bind(this)
     this.HandleLogout = this.HandleLogout.bind(this)
+    this.UpdateTime = this.UpdateTime.bind(this)
+    this.days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    this.months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  }
+
+  componentDidMount() {
+    setInterval(this.UpdateTime, 60000)
   }
 
   ToggleLogin() {
@@ -54,11 +61,32 @@ class App extends Component {
     })
   }
 
+  UpdateTime() {
+    let d = new Date()
+    let hour = d.getHours()
+    let ampm = 'am'
+    if (hour === 0) hour = 12
+    if (hour > 12) {
+      hour -= 12
+      ampm = 'pm'
+    }
+    let minute = d.getMinutes()
+    if (minute < 10) {
+      minute = '0' + minute.toString()
+    }
+    let dateString = this.days[d.getDay()] + ' ' + this.months[d.getMonth()] + ' ' + d.getDate() + ' ' + hour + ':' + minute + ' ' + ampm
+    this.setState({
+      currentTime: dateString
+    })
+  }
+
   componentWillMount() {
     let geo = navigator.geolocation
     geo.getCurrentPosition((pos) => {
+      /*
       console.log(pos.coords.latitude)
       console.log(pos.coords.longitude)
+      */
       fetch(Config.api.url+'/tournaments/'+pos.coords.latitude+'/'+pos.coords.longitude,
         {
           method: 'GET',
@@ -154,49 +182,54 @@ class App extends Component {
             <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
-                <Nav>
-                  <NavItem>
-                    <input placeholder="search" />&nbsp;<Button bsSize="small">Search</Button>
-                  </NavItem>
-                </Nav>
-                <Nav pullRight>
-                  <NavItem onClick={this.ToggleAbout} eventKey={3}>
-                    About
-                  </NavItem>
-                  <NavItem onClick={this.ToggleSubmit} eventKey={1}>
-                    Submit
-                  </NavItem>
-                  <NavItem className="officiallogin" onClick={this.ToggleLogin} eventKey={2}>
-                    Event Offical Login
-                  </NavItem>
-                  {this.state.isLoggedin &&
-                    <NavItem onClick={this.HandleLogout}>
-                      Logout
-                    </NavItem>
-                  }
-                  {this.state.isLoggedIn &&
-                    <NavItem onClick={this.ToggleAdmin}>
-                      Admin
-                    </NavItem>
-                  }
-                  <NavDropdown title="Contact Us" id="contact">
-                    <div className="contactarea">
-                      For information, questions, or comments, please contact:
-                      <div>
-                        <span className="email">khkwan0@gmail.com</span>
-                      </div>
-                    </div>
-                  </NavDropdown>
-
-                </Nav>
+            <Nav>
+              <NavItem disabled>
+                <span className="localdate">{this.state.currentTime} {this.state.tz}</span>
+              </NavItem>
+            </Nav>
+            <Nav pullRight>
+              <NavItem>
+                <Glyphicon glyph="search" />
+              </NavItem>
+              <NavItem onClick={this.ToggleAbout} eventKey={3}>
+                About
+              </NavItem>
+              <NavItem onClick={this.ToggleSubmit} eventKey={1}>
+                Submit
+              </NavItem>
+              <NavItem className="officiallogin" onClick={this.ToggleLogin} eventKey={2}>
+                Event Offical Login
+              </NavItem>
+              {this.state.isLoggedin &&
+                <NavItem onClick={this.HandleLogout}>
+                  Logout
+                </NavItem>
+              }
+              {this.state.isLoggedIn &&
+                <NavItem onClick={this.ToggleAdmin}>
+                  Admin
+                </NavItem>
+              }
+              <NavDropdown title="Contact Us" id="contact">
+                <div className="contactarea">
+                  For information, questions, or comments, please contact:
+                  <div>
+                    <span className="email">khkwan0@gmail.com</span>
+                  </div>
+                </div>
+              </NavDropdown>
+            </Nav>
           </Navbar.Collapse>
         </Navbar>
-        <Navbar fixedBottom>
-          <Navbar.Header>
-            <Navbar.Brand>
-              Copyright 2018
-            </Navbar.Brand>
-          </Navbar.Header>
+        <Navbar inverse fixedBottom>
+            <Nav>
+              <NavItem disabled><span className="location_area">Copyright 2018</span></NavItem>
+            </Nav>
+            <Nav pullRight>
+              <NavItem disabled>
+                <span className="location_area">Your approximate location: {this.state.location}</span>
+              </NavItem>
+            </Nav>
         </Navbar>
         {this.state.showLogin &&
           <LoginPanel closeLogin={this.ToggleLogin} />
@@ -215,16 +248,7 @@ class App extends Component {
             <div>
               <div className="location_area">
                 <div>
-                  <span sm={2}>
-                    Your approximate location: {this.state.location}
-                  </span>
-                </div>
-                <div>
                   <span>
-                    Local Time: {this.state.currentTime}
-                  </span>
-                  <span>
-                    Timezone: {this.state.tz}
                   </span>
                 </div>
               </div>
